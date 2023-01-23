@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       // title: 'Voting App',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
           primaryColor: Colors.white,
           inputDecorationTheme: const InputDecorationTheme(
@@ -122,198 +123,254 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(144, 131, 77, 33),
-      ),
-      body: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: _nameControllers.length,
-                itemBuilder: (context, index) {
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _nameControllers[index],
-                          decoration: InputDecoration(
-                            labelText: 'Name ${index + 1}',
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Color.fromARGB(255, 70, 70, 70)),
-                            ),
-                            focusedBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Color.fromARGB(255, 112, 112, 112)),
-                            ),
-                          ),
-                          onChanged: (value) {
-                            _saveData();
-                          },
-                          validator: (value) {
-                            if (value != null && value.isEmpty) {
-                              return 'Please enter a name';
-                            } else if (namesSet.contains(value)) {
-                              return 'Please enter a different name';
-                            }
-                            namesSet.add(value.toString());
-                            return null;
-                          },
-                        ),
-                      ),
-                      if (index > 0)
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () {
-                            // Remove the name controller from the list
-                            _saveData();
-                            setState(() {
-                              _nameControllers.removeAt(index);
-                            });
-                          },
-                        ),
-                    ],
-                  );
-                },
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                // Add a button to add a new name to the list
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _nameControllers.add(TextEditingController());
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.black38),
-                  child: const Text('Add Name'),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.black38),
-                  child: Text('Clear All Names'),
-                  onPressed: () {
-                    setState(() {
-                      _nameControllers.clear();
-                      _nameControllers.add(TextEditingController());
-                    });
-                  },
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 100.0),
-              child: TextFormField(
-                controller: _codeController,
-                keyboardType:
-                    TextInputType.number,
-                    textAlign: TextAlign.center, // Set keyboard type to number
-                decoration: const InputDecoration(
-                  label: Center(
-                    child: Text('Code'),
-                  ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Color.fromARGB(255, 70, 70, 70)),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Color.fromARGB(255, 112, 112, 112)),
-                  ),
-                ),
-                validator: (value) {
-                  if (value != null && value.isEmpty) {
-                    if (value.length != 6) {
-                      return 'Please enter a 6-digit code';
-                    }
-                  }
-                  return null;
-                },
-              ),
-            ),
-
-            ElevatedButton(
-              onPressed: () async {
-                // Clear the namesSet
-                _clearNamesSet();
-
-                if (_formKey.currentState!.validate()) {
-                  _formKey.currentState!.save();
-                  _saveData();
-                  // Send the name and code to the backend server
-                  var codeExists = await checkCodeExists(_codeController.text);
-                  if (!codeExists) {
-                    // Show the floating dialogue
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return SizedBox(
-                          width: 200,
-                          height: 200,
-                          child: SimpleDialog(
-                            children: <Widget>[
-                              const Padding(
-                                padding: EdgeInsets.fromLTRB(0, 40, 0, 0),
-                                child: Center(
-                                    child: Text("Submitted!",
-                                        style: TextStyle(fontSize: 20))),
-                              ),
-                              Align(
-                                alignment: Alignment.bottomRight,
-                                child: TextButton(
-                                  child: const Text("OK"),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
+    return BackgroundImageWidget(
+      image: const AssetImage('assets/image1.jpeg'),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+        ),
+        body: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _nameControllers.length,
+                  itemBuilder: (context, index) {
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+                            child: TextFormField(
+                              style: TextStyle(color: Color.fromARGB(213, 255, 255, 255)),
+                              controller: _nameControllers[index],
+                              decoration: InputDecoration(
+                                labelText: 'Name ${index + 1}',
+                                labelStyle: const TextStyle(color: Colors.white70),
+                                enabledBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color.fromARGB(255, 78, 96, 99)),
+                                ),
+                                focusedBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color.fromARGB(255, 158, 158, 158)),
                                 ),
                               ),
-                            ],
+                              onChanged: (value) {
+                                _saveData();
+                              },
+                              validator: (value) {
+                                if (value != null && value.isEmpty) {
+                                  return 'Please enter a name';
+                                } else if (namesSet.contains(value)) {
+                                  return 'Please enter a different name';
+                                }
+                                namesSet.add(value.toString());
+                                return null;
+                              },
+                            ),
                           ),
-                        );
-                      },
+                        ),
+                        if (index > 0)
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            color: Color.fromARGB(70, 180, 180, 180),
+                            onPressed: () {
+                              // Remove the name controller from the list
+                              _saveData();
+                              setState(() {
+                                _nameControllers.removeAt(index);
+                              });
+                            },
+                          ),
+                      ],
                     );
+                  },
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  // Add a button to add a new name to the list
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _nameControllers.add(TextEditingController());
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(50, 151, 151, 151)),
+                    child: const Text('Add Name'),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(50, 151, 151, 151)),
+                    child: Text('Clear All Names'),
+                    onPressed: () {
+                      setState(() {
+                        _nameControllers.clear();
+                        _nameControllers.add(TextEditingController());
+                      });
+                    },
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 100.0),
+                child: TextFormField(
+                  style: TextStyle(color: Color.fromARGB(255, 228, 228, 228)),
+                  controller: _codeController,
+                  keyboardType: TextInputType.number,
+                  textAlign: TextAlign.center, // Set keyboard type to number
+                  decoration: const InputDecoration(
+                    label: Center(
+                      child: Text('Code'),
+                    ),
+                    labelStyle: TextStyle(color: Color.fromARGB(220, 255, 255, 255)),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Color.fromARGB(255, 70, 70, 70)),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Color.fromARGB(255, 112, 112, 112)),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value != null && value.isEmpty) {
+                      if (value.length != 6) {
+                        return 'Please enter a 6-digit code';
+                      }
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  // Clear the namesSet
+                  _clearNamesSet();
+
+                  if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
+                    _saveData();
+                    // Send the name and code to the backend server
+                    var codeExists =
+                        await checkCodeExists(_codeController.text);
+                    if (!codeExists) {
+                      // Show the floating dialogue
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return SizedBox(
+                            width: 200,
+                            height: 200,
+                            child: SimpleDialog(
+                              children: <Widget>[
+                                const Padding(
+                                  padding: EdgeInsets.fromLTRB(0, 40, 0, 0),
+                                  child: Center(
+                                      child: Text("Submitted!",
+                                          style: TextStyle(fontSize: 20))),
+                                ),
+                                Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: TextButton(
+                                    child: const Text("OK"),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    }
+
+                    // Send the name and code to the backend server
+
+                    if (codeExists) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('This code already exists'),
+                      ));
+                      return;
+                    }
+                    try {
+                      final namesJson = jsonEncode({
+                        'names': _nameControllers.map((c) => c.text).toList(),
+                      });
+                      final response = await http.post(
+                        Uri.parse(
+                            'http://flutter-voting-app.herokuapp.com/vote'),
+                        headers: {'Content-Type': 'application/json'},
+                        body: namesJson,
+                      );
+
+                      // //check for duplicate names
+
+                      // if (response.statusCode == 200) {
+                      //   print('Success');
+                      // } else {
+                      //   print('Error');
+                      // }
+                    } catch (e) {
+                      //print('Error: $e');
+                    }
                   }
-
-                  // Send the name and code to the backend server
-
-                  if (codeExists) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('This code already exists'),
-                    ));
-                    return;
-                  }
-                  try {
-                    final namesJson = jsonEncode({
-                      'names': _nameControllers.map((c) => c.text).toList(),
-                    });
-                    final response = await http.post(
-                      Uri.parse('http://flutter-voting-app.herokuapp.com/vote'),
-                      headers: {'Content-Type': 'application/json'},
-                      body: namesJson,
-                    );
-
-                    // //check for duplicate names
-
-                    // if (response.statusCode == 200) {
-                    //   print('Success');
-                    // } else {
-                    //   print('Error');
-                    // }
-                  } catch (e) {
-                    //print('Error: $e');
-                  }
-                }
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.black38),
-              child: const Text('Submit'),
-            ),
-          ],
+                },
+                style:
+                    ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(49, 99, 99, 99)),
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+}
+
+class BackgroundImageWidget extends StatelessWidget {
+  final Widget child;
+  final ImageProvider image;
+
+  const BackgroundImageWidget({
+    Key? key,
+    required this.image,
+    required this.child,
+  }) : super(key: key);
+
+  Widget buildBackground() {
+    return ShaderMask(
+      shaderCallback: (bounds) => LinearGradient(
+        colors: [Colors.black38, Color.fromARGB(242, 0, 0, 0)],
+        begin: Alignment.center,
+        end: Alignment.bottomCenter,
+      ).createShader(bounds),
+      blendMode: BlendMode.darken,
+      child: Container(
+        decoration: BoxDecoration(
+            image: DecorationImage(
+                image: image,
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Colors.black.withOpacity(0.2),
+                  BlendMode.darken,
+                ))),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      buildBackground(),
+      child,
+    ]);
   }
 }
