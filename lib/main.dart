@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   runApp(MyApp());
 }
+
+String host='http://192.168.1.31:8080';
 
 class MyApp extends StatelessWidget {
   @override
@@ -25,12 +28,14 @@ class MyApp extends StatelessWidget {
             selectionHandleColor: Color.fromARGB(255, 59, 58, 53),
             selectionColor: Color.fromARGB(255, 151, 149, 143),
           )),
-      home: SplashScreen(),
+      home: const SplashScreen(),
     );
   }
 }
 
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
@@ -83,19 +88,24 @@ class _HomePageState extends State<HomePage> {
     namesSet.clear();
   }
 
-  Future<bool> checkCodeExists(String code) async {
+  FutureOr<bool?> checkCodeExists(String code) async {
     // make an http request to the server to check if the code already exists
     // return true if the code already exists, false otherwise
     // use http package to make request
-    final response = //Uri.parse('https://192.168.0.242:3000/codeExists/$code')
+    try{
+      final response = //Uri.parse('https://192.168.0.242:3000/codeExists/$code')
         await http.get(Uri.parse(
-            'http://flutter-voting-app.herokuapp.com/codeExists/$code'));
+            '$host/codeExists/$code'));
 
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
       return responseBody;
-    } else {
-      throw Exception('Failed to check code existence');
+    }
+    else{
+      return null;
+    }
+    } catch(e) {
+      return null;
     }
   }
 
@@ -145,7 +155,8 @@ class _HomePageState extends State<HomePage> {
                           child: Padding(
                             padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
                             child: TextFormField(
-                              style: TextStyle(color: Color.fromARGB(213, 255, 255, 255)),
+                              cursorColor: const Color.fromARGB(213, 255, 255, 255),
+                              style: const TextStyle(color: Color.fromARGB(213, 255, 255, 255)),
                               controller: _nameControllers[index],
                               decoration: InputDecoration(
                                 labelText: 'Name ${index + 1}',
@@ -177,7 +188,7 @@ class _HomePageState extends State<HomePage> {
                         if (index > 0)
                           IconButton(
                             icon: const Icon(Icons.close),
-                            color: Color.fromARGB(70, 180, 180, 180),
+                            color: const Color.fromARGB(70, 180, 180, 180),
                             onPressed: () {
                               // Remove the name controller from the list
                               _saveData();
@@ -202,13 +213,13 @@ class _HomePageState extends State<HomePage> {
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(50, 151, 151, 151)),
+                        backgroundColor: const Color.fromARGB(50, 151, 151, 151)),
                     child: const Text('Add Name'),
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(50, 151, 151, 151)),
-                    child: Text('Clear All Names'),
+                        backgroundColor: const Color.fromARGB(50, 151, 151, 151)),
+                    child: const Text('Clear All Names'),
                     onPressed: () {
                       setState(() {
                         _nameControllers.clear();
@@ -221,7 +232,8 @@ class _HomePageState extends State<HomePage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 100.0),
                 child: TextFormField(
-                  style: TextStyle(color: Color.fromARGB(255, 228, 228, 228)),
+                  cursorColor: const Color.fromARGB(213, 255, 255, 255),
+                  style: const TextStyle(color: Color.fromARGB(255, 228, 228, 228)),
                   controller: _codeController,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center, // Set keyboard type to number
@@ -240,13 +252,16 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   validator: (value) {
-                    if (value != null && value.isEmpty) {
-                      if (value.length != 6) {
+                    if(value == null || value.isEmpty){
+                      return 'Empty Response';
+                    }
+                    else if (value.length != 6) {
                         return 'Please enter a 6-digit code';
                       }
+                      else{
+                        return null;
+                      }
                     }
-                    return null;
-                  },
                 ),
               ),
               ElevatedButton(
@@ -260,6 +275,12 @@ class _HomePageState extends State<HomePage> {
                     // Send the name and code to the backend server
                     var codeExists =
                         await checkCodeExists(_codeController.text);
+                    if(codeExists == null){
+                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Backend seems to be offline...'),
+                      ));
+                      return;
+                    }
                     if (!codeExists) {
                       // Show the floating dialogue
                       showDialog(
@@ -304,9 +325,10 @@ class _HomePageState extends State<HomePage> {
                       final namesJson = jsonEncode({
                         'names': _nameControllers.map((c) => c.text).toList(),
                       });
-                      final response = await http.post(
+                      //final response = 
+                      await http.post(
                         Uri.parse(
-                            'http://flutter-voting-app.herokuapp.com/vote'),
+                            '$host/vote'),
                         headers: {'Content-Type': 'application/json'},
                         body: namesJson,
                       );
@@ -324,7 +346,7 @@ class _HomePageState extends State<HomePage> {
                   }
                 },
                 style:
-                    ElevatedButton.styleFrom(backgroundColor: Color.fromARGB(49, 99, 99, 99)),
+                    ElevatedButton.styleFrom(backgroundColor:  const Color.fromARGB(49, 99, 99, 99)),
                 child: const Text('Submit'),
               ),
             ],
@@ -347,7 +369,7 @@ class BackgroundImageWidget extends StatelessWidget {
 
   Widget buildBackground() {
     return ShaderMask(
-      shaderCallback: (bounds) => LinearGradient(
+      shaderCallback: (bounds) => const LinearGradient(
         colors: [Colors.black38, Color.fromARGB(242, 0, 0, 0)],
         begin: Alignment.center,
         end: Alignment.bottomCenter,
