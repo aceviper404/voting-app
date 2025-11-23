@@ -9,7 +9,7 @@ void main() {
   runApp(MyApp());
 }
 
-String host='http://192.168.1.31:8080';
+String host=${environment.host};
 
 class MyApp extends StatelessWidget {
   @override
@@ -93,7 +93,7 @@ class _HomePageState extends State<HomePage> {
     // return true if the code already exists, false otherwise
     // use http package to make request
     try{
-      final response = //Uri.parse('https://192.168.0.242:3000/codeExists/$code')
+      final response = //Uri.parse('http://+'host'+/codeExists/$code')
         await http.get(Uri.parse(
             '$host/codeExists/$code'));
 
